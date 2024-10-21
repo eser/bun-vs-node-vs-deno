@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 const testDataPath = process.env.TEST_DATA_PATH || '/app/test_data';
 const filePath = path.join(testDataPath, 'large_data.json');
 

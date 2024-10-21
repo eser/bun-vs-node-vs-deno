@@ -1,11 +1,12 @@
 #!/bin/bash
 
+# Set the base directory
 BASE_DIR="$(dirname "$0")"
 
 chmod +x "$BASE_DIR"/*.sh
 
-if ! command -v bun &> /dev/null || ! command -v node &> /dev/null; then
-    echo "Both Bun and Node.js are required to run these tests. Exiting."
+if ! command -v node &> /dev/null || ! command -v bun &> /dev/null || ! command -v deno &> /dev/null; then
+    echo "Node.js, Bun and Deno are required to run these tests. Exiting."
     exit 1
 fi
 

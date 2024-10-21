@@ -14,7 +14,7 @@ run_package_install_benchmark() {
     
     local prepare_with_lock="rm -rf $PROJECT_ROOT/tests/package_install/$project/node_modules"
     
-    local prepare_without_lock="rm -rf $PROJECT_ROOT/tests/package_install/$project/node_modules $PROJECT_ROOT/tests/package_install/$project/bun.lockb $PROJECT_ROOT/tests/package_install/$project/package-lock.json"
+    local prepare_without_lock="rm -rf $PROJECT_ROOT/tests/package_install/$project/node_modules $PROJECT_ROOT/tests/package_install/$project/package-lock.json $PROJECT_ROOT/tests/package_install/$project/bun.lockb $PROJECT_ROOT/tests/package_install/$project/deno.lock"
     
     hyperfine \
         --warmup 2 \
@@ -23,8 +23,9 @@ run_package_install_benchmark() {
         --export-markdown "$RESULTS_DIR/$project/results_with_lock.md" \
         --export-json "$RESULTS_DIR/$project/results_with_lock.json" \
         --show-output \
+        "cd $PROJECT_ROOT/tests/package_install/$project && npm install" \
         "cd $PROJECT_ROOT/tests/package_install/$project && bun install" \
-        "cd $PROJECT_ROOT/tests/package_install/$project && npm install"
+        "cd $PROJECT_ROOT/tests/package_install/$project && deno install"
     
     hyperfine \
         --warmup 2 \
@@ -33,19 +34,24 @@ run_package_install_benchmark() {
         --export-markdown "$RESULTS_DIR/$project/results_without_lock.md" \
         --export-json "$RESULTS_DIR/$project/results_without_lock.json" \
         --show-output \
+        "cd $PROJECT_ROOT/tests/package_install/$project && npm install" \
         "cd $PROJECT_ROOT/tests/package_install/$project && bun install" \
-        "cd $PROJECT_ROOT/tests/package_install/$project && npm install"
+        "cd $PROJECT_ROOT/tests/package_install/$project && deno install"
     
     echo "Resource usage for $project:"
     {
-        echo "Bun with lock:"
-        /usr/bin/time -v bash -c "$prepare_with_lock && cd $PROJECT_ROOT/tests/package_install/$project && bun install" 2>&1
-        echo -e "\nBun without lock:"
-        /usr/bin/time -v bash -c "$prepare_without_lock && cd $PROJECT_ROOT/tests/package_install/$project && bun install" 2>&1
-        echo -e "\nNPM with lock:"
+        echo "NPM with lock:"
         /usr/bin/time -v bash -c "$prepare_with_lock && cd $PROJECT_ROOT/tests/package_install/$project && npm install" 2>&1
         echo -e "\nNPM without lock:"
         /usr/bin/time -v bash -c "$prepare_without_lock && cd $PROJECT_ROOT/tests/package_install/$project && npm install" 2>&1
+        echo -e "\nBun with lock:"
+        /usr/bin/time -v bash -c "$prepare_with_lock && cd $PROJECT_ROOT/tests/package_install/$project && bun install" 2>&1
+        echo -e "\nBun without lock:"
+        /usr/bin/time -v bash -c "$prepare_without_lock && cd $PROJECT_ROOT/tests/package_install/$project && bun install" 2>&1
+        echo -e "\nDeno with lock:"
+        /usr/bin/time -v bash -c "$prepare_with_lock && cd $PROJECT_ROOT/tests/package_install/$project && deno install" 2>&1
+        echo -e "\nDeno without lock:"
+        /usr/bin/time -v bash -c "$prepare_without_lock && cd $PROJECT_ROOT/tests/package_install/$project && deno install" 2>&1
     } | tee "$RESULTS_DIR/$project/resource_usage.txt"
 }
 
@@ -63,15 +69,18 @@ run_single_package_install_benchmark() {
         --export-markdown "$RESULTS_DIR/bloated-project/results.md" \
         --export-json "$RESULTS_DIR/bloated-project/results.json" \
         --show-output \
+        "cd $PROJECT_ROOT/tests/package_install/bloated-project && npm install moment" \
         "cd $PROJECT_ROOT/tests/package_install/bloated-project && bun add moment" \
-        "cd $PROJECT_ROOT/tests/package_install/bloated-project && npm install moment"
+        "cd $PROJECT_ROOT/tests/package_install/bloated-project && deno add moment"
     
     echo "Resource usage for bloated-project single package install:"
     {
-        echo "Bun:"
-        /usr/bin/time -v bash -c "$prepare_command && cd $PROJECT_ROOT/tests/package_install/bloated-project && bun add moment" 2>&1
-        echo -e "\nNPM:"
+        echo "NPM:"
         /usr/bin/time -v bash -c "$prepare_command && cd $PROJECT_ROOT/tests/package_install/bloated-project && npm install moment" 2>&1
+        echo -e "\nBun:"
+        /usr/bin/time -v bash -c "$prepare_command && cd $PROJECT_ROOT/tests/package_install/bloated-project && bun add moment" 2>&1
+        echo -e "\nDeno:"
+        /usr/bin/time -v bash -c "$prepare_command && cd $PROJECT_ROOT/tests/package_install/bloated-project && deno add moment" 2>&1
     } | tee "$RESULTS_DIR/bloated-project/resource_usage.txt"
 }
 

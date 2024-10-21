@@ -14,6 +14,9 @@ RUN apt-get install -y nodejs=20.16.0-1nodesource1
 # Install Bun (v1.1.21)
 RUN curl -fsSL https://bun.sh/install | bash -s "bun-v1.1.21"
 
+# Install Deno (v2.0.2)
+RUN curl -fsSL https://deno.land/install.sh | sh -s "v2.0.2"
+
 # Install Hyperfine
 RUN wget https://github.com/sharkdp/hyperfine/releases/download/v1.15.0/hyperfine_1.15.0_amd64.deb
 RUN dpkg -i hyperfine_1.15.0_amd64.deb
@@ -40,6 +43,7 @@ ENV PATH="/root/.bun/bin:${PATH}"
 # Verify installations
 RUN node --version && npm --version
 RUN bun --version
+RUN deno --version
 RUN hyperfine --version
 RUN bombardier --version
 

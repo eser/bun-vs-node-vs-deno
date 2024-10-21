@@ -4,8 +4,9 @@
 CONNECTIONS=125
 REQUESTS=100000
 
-BUN_IP="164.92.132.234"
 NODE_IP="64.226.107.21"
+BUN_IP="164.92.132.234"
+DENO_IP="214.92.132.234"
 PORT=6693
 
 # Assume we have 1,000,000 users (must be same with database records)
@@ -31,13 +32,16 @@ run_http_benchmark() {
     
     # Generate a random user ID for user API test
     if [[ "$test_name" == *"user_populated"* ]]; then
-        local bun_random_id=$((RANDOM % MAX_USER_ID + 1))
         local node_random_id=$((RANDOM % MAX_USER_ID + 1))
-        bun_full_path="${full_path}${bun_random_id}"
+        local bun_random_id=$((RANDOM % MAX_USER_ID + 1))
+        local deno_random_id=$((RANDOM % MAX_USER_ID + 1))
         node_full_path="${full_path}${node_random_id}"
+        bun_full_path="${full_path}${bun_random_id}"
+        deno_full_path="${full_path}${deno_random_id}"
     else
-        bun_full_path=$full_path
         node_full_path=$full_path
+        bun_full_path=$full_path
+        deno_full_path=$full_path
     fi
     
     local bombardier_args="-c $CONNECTIONS -n $REQUESTS -l -p r -o json"
@@ -45,14 +49,19 @@ run_http_benchmark() {
         bombardier_args="$bombardier_args -m POST -f $data"
     fi
     
+    # Run Bombardier for Node.js (JSON output)
+    if ! bombardier $bombardier_args "http://$NODE_IP:$PORT$node_full_path" > "/app/results/http/$test_name/${test_name}_node_bombardier.json" 2>&1; then
+        echo "Error running Bombardier for Node.js test: $test_name" >&2
+    fi
+    
     # Run Bombardier for Bun (JSON output)
     if ! bombardier $bombardier_args "http://$BUN_IP:$PORT$bun_full_path" > "/app/results/http/$test_name/${test_name}_bun_bombardier.json" 2>&1; then
         echo "Error running Bombardier for Bun test: $test_name" >&2
     fi
     
-    # Run Bombardier for Node (JSON output)
-    if ! bombardier $bombardier_args "http://$NODE_IP:$PORT$node_full_path" > "/app/results/http/$test_name/${test_name}_node_bombardier.json" 2>&1; then
-        echo "Error running Bombardier for Node test: $test_name" >&2
+    # Run Bombardier for Deno (JSON output)
+    if ! bombardier $bombardier_args "http://$DENO_IP:$PORT$deno_full_path" > "/app/results/http/$test_name/${test_name}_deno_bombardier.json" 2>&1; then
+        echo "Error running Bombardier for Deno test: $test_name" >&2
     fi
     
     echo "HTTP benchmark for $test_name completed. Results saved in /app/results/http/$test_name/"
@@ -84,7 +93,7 @@ rm /tmp/movie_data.json
 
 echo "All HTTP tests completed. Merging JSON results..."
 
-# Run the Node script to merge HTTP results
+# Run the Node.js script to merge HTTP results
 node /app/utils/merge_http_results.js
 
 echo "All HTTP tests completed and results processed. Results are saved in their respective directories under /app/results/http."

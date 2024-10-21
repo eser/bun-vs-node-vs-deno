@@ -1,11 +1,12 @@
-# Node.js vs Bun Performance Benchmark
+# Node.js vs Bun vs Deno Performance Benchmark
 
-Node.js and Bun performance comparison across various programming tasks.
+Node.js, Bun and Deno performance comparison across various programming tasks.
 
 ## Tools & Versions
 
 - Node.js: 20.16.0
 - Bun: 1.1.20
+- Deno: 2.0.2
 - Docker: 20.10.8
 - Hyperfine: 1.16.1
 - Bombardier: 1.2.6
@@ -14,7 +15,7 @@ Node.js and Bun performance comparison across various programming tasks.
 
 ## Project Structure
 
-- `Dockerfile.both`: Docker configuration for both Bun and Node.js environments
+- `Dockerfile.all`: Docker configuration for both Node.js, Bun and Deno environments
 - `tests/`: Directory containing test scripts for various categories
   - `basic/`: Basic operation tests (e.g., while loops, Fibonacci calculation)
   - `file/`: File operation tests
@@ -29,24 +30,24 @@ Node.js and Bun performance comparison across various programming tasks.
 
 ### Prerequisites
 
-Before running the benchmarks, you need to build the Docker image from Dockerfile.both:
+Before running the benchmarks, you need to build the Docker image from Dockerfile.all:
 
 To run the benchmarks, use the following commands:
 
 ```bash
-bun run benchmark # Run all benchmarks on Docker
-bun run benchmark:local # Run all benchmarks on local machine
-bun run benchmark-basic
-bun run benchmark-basic:local
+node --run benchmark # Run all benchmarks on Docker
+node --run benchmark:local # Run all benchmarks on local machine
+node --run benchmark-basic
+node --run benchmark-basic:local
 # and so on... Check package.json for more commands
 ```
 
 # Build the Docker images
 
-Building only the `Dockerfile.both` is enough for running the tests on Docker. Other Dockerfiles are there just for reference.
+Building only the `Dockerfile.all` is enough for running the tests on Docker. Other Dockerfiles are there just for reference.
 
 ```bash
-docker build -f Dockerfile.both -t benchmark-test .
+docker build -f Dockerfile.all -t benchmark-test .
 ```
 
 # Run the tests
@@ -56,7 +57,7 @@ Feel free to change the CPU and memory values, or use different images
 ```bash
 docker run --cpus=6 --memory=12g --rm -v $(pwd):/app benchmark-test bash /app/run_tests.sh
 # or use benchmark command, but keep in mind that will use the default values for CPU and memory
-bun run benchmark
+node --run benchmark
 ```
 
 ## Benchmarking Tools

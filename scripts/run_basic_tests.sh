@@ -14,14 +14,18 @@ run_basic_benchmark() {
         --export-markdown "/app/results/$test_name/${test_name}_results.md" \
         --export-json "/app/results/$test_name/${test_name}_results.json" \
         --show-output \
+        "node $script" \
         "bun $script" \
-        "node $script"
+        "deno $script"
+
+    echo "Resource usage for $test_name with Node.js:"
+    /usr/bin/time -v node $script 2>&1 | tee "/app/results/$test_name/${test_name}_node_resources.txt"
     
     echo "Resource usage for $test_name with Bun:"
     /usr/bin/time -v bun $script 2>&1 | tee "/app/results/$test_name/${test_name}_bun_resources.txt"
     
-    echo "Resource usage for $test_name with Node:"
-    /usr/bin/time -v node $script 2>&1 | tee "/app/results/$test_name/${test_name}_node_resources.txt"
+    echo "Resource usage for $test_name with Deno:"
+    /usr/bin/time -v deno $script 2>&1 | tee "/app/results/$test_name/${test_name}_deno_resources.txt"
 }
 
 mkdir -p "/app/results/basic"

@@ -1,5 +1,5 @@
 import { writeFileSync, createWriteStream, mkdirSync } from 'node:fs';
-import { join } from 'path';
+import { join } from 'node:path';
 
 const testDataPath = process.env.TEST_DATA_PATH || '/app/test_data';
 const outputDir = join(testDataPath, 'very_large_files');

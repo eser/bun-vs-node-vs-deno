@@ -9,22 +9,26 @@ curl -fsSL https://bun.sh/install | bash
 # Add Bun to PATH (you may want to add this to your .bashrc or .zshrc)
 export PATH=$HOME/.bun/bin:$PATH
 
-3. Install Go
+3. Install Deno 2.0.2
+curl -fsSL https://deno.land/install.sh | sh
+
+4. Install Go
 sudo apt-get update
 sudo apt-get install -y golang-go
 
-4. Install Bombardier
+5. Install Bombardier
 go install github.com/codesenberg/bombardier@latest
 # Add Go binaries to PATH (you may want to add this to your .bashrc or .zshrc)
 export PATH=$HOME/go/bin:$PATH
 
-5. Install Hyperfine
+6. Install Hyperfine
 wget https://github.com/sharkdp/hyperfine/releases/download/v1.16.1/hyperfine_1.16.1_amd64.deb
 sudo dpkg -i hyperfine_1.16.1_amd64.deb
 
 # Verify installations
 node --version  # Should output v20.16.0
 bun --version   # Should output 1.1.20
+deno --version  # Should output v2.0.2
 go version
 bombardier --version
 hyperfine --version

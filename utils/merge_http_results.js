@@ -1,5 +1,5 @@
-import { readdir, readFile, writeFile } from 'fs/promises';
-import { join, basename } from 'path';
+import { readdir, readFile, writeFile } from 'node:fs/promises';
+import { join, basename } from 'node:path';
 
 const RESULTS_DIR = '/root/bun-vs-node/results/http';
 

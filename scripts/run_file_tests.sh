@@ -3,9 +3,9 @@
 run_file_benchmark() {
     local test_category=$1
     local test_name=$2
-    local bun_script=$3
-    local node_script=$4
-    
+    local node_script=$3
+    local bun_script=$4
+    local deno_script=$5
     echo "Running benchmark for $test_category - $test_name"
     
     mkdir -p "/app/results/$test_category"
@@ -16,18 +16,26 @@ run_file_benchmark() {
         --export-markdown "/app/results/$test_category/${test_name}_results.md" \
         --export-json "/app/results/$test_category/${test_name}_results.json" \
         --show-output \
+        "node $node_script" \
         "bun $bun_script" \
         "bun $node_script" \
-        "node $node_script"
+        "deno $deno_script" \
+        "deno $node_script"
     
+    echo "Resource usage for $test_name with Node.js:"
+    /usr/bin/time -v node $node_script 2>&1 | tee "/app/results/$test_category/${test_name}_node_resources.txt"
+
     echo "Resource usage for $test_name with Bun (Bun API):"
     /usr/bin/time -v bun $bun_script 2>&1 | tee "/app/results/$test_category/${test_name}_bun_bun_api_resources.txt"
     
     echo "Resource usage for $test_name with Bun (Node.js API):"
     /usr/bin/time -v bun $node_script 2>&1 | tee "/app/results/$test_category/${test_name}_bun_node_api_resources.txt"
     
-    echo "Resource usage for $test_name with Node:"
-    /usr/bin/time -v node $node_script 2>&1 | tee "/app/results/$test_category/${test_name}_node_resources.txt"
+    echo "Resource usage for $test_name with Deno (Deno API):"
+    /usr/bin/time -v deno $deno_script 2>&1 | tee "/app/results/$test_category/${test_name}_deno_deno_api_resources.txt"
+    
+    echo "Resource usage for $test_name with Deno (Node.js API):"
+    /usr/bin/time -v deno $node_script 2>&1 | tee "/app/results/$test_category/${test_name}_deno_node_api_resources.txt"
 }
 
 mkdir -p "/app/results/file"
@@ -60,14 +68,14 @@ fi
 
 echo "Starting read tests..."
 
-run_file_benchmark "single_large_json_parse" "parse_json" "/app/tests/file/single_large_json_parse/parse_json_bun.js" "/app/tests/file/single_large_json_parse/parse_json_node.js"
-run_file_benchmark "compress" "compress" "/app/tests/file/compress/compress_bun.js" "/app/tests/file/compress/compress_node.js"
-run_file_benchmark "small_files" "small_files_sequential" "/app/tests/file/small_files/small_files_sequential_bun.js" "/app/tests/file/small_files/small_files_sequential_node.js"
-run_file_benchmark "small_files" "small_files_parallel" "/app/tests/file/small_files/small_files_parallel_bun.js" "/app/tests/file/small_files/small_files_parallel_node.js"
+run_file_benchmark "single_large_json_parse" "parse_json" "/app/tests/file/single_large_json_parse/parse_json_node.js" "/app/tests/file/single_large_json_parse/parse_json_bun.js" "/app/tests/file/single_large_json_parse/parse_json_deno.js"
+run_file_benchmark "compress" "compress" "/app/tests/file/compress/compress_node.js" "/app/tests/file/compress/compress_bun.js" "/app/tests/file/compress/compress_deno.js"
+run_file_benchmark "small_files" "small_files_sequential" "/app/tests/file/small_files/small_files_sequential_node.js" "/app/tests/file/small_files/small_files_sequential_bun.js" "/app/tests/file/small_files/small_files_sequential_deno.js"
+run_file_benchmark "small_files" "small_files_parallel" "/app/tests/file/small_files/small_files_parallel_node.js" "/app/tests/file/small_files/small_files_parallel_bun.js" "/app/tests/file/small_files/small_files_parallel_deno.js"
 
 echo "Starting large file read tests..."
-run_file_benchmark "very_large_file_read" "very_large_csv_read" "/app/tests/file/very_large_file_read/csv_read_bun.js" "/app/tests/file/very_large_file_read/csv_read_node.js"
-run_file_benchmark "very_large_file_read" "very_large_json_read" "/app/tests/file/very_large_file_read/json_read_bun.js" "/app/tests/file/very_large_file_read/json_read_node.js"
+run_file_benchmark "very_large_file_read" "very_large_csv_read" "/app/tests/file/very_large_file_read/csv_read_node.js" "/app/tests/file/very_large_file_read/csv_read_bun.js" "/app/tests/file/very_large_file_read/csv_read_deno.js"
+run_file_benchmark "very_large_file_read" "very_large_json_read" "/app/tests/file/very_large_file_read/json_read_node.js" "/app/tests/file/very_large_file_read/json_read_bun.js" "/app/tests/file/very_large_file_read/json_read_deno.js"
 
 echo "Large file read tests completed."
 
@@ -75,8 +83,8 @@ echo "Read tests completed."
 
 echo "Starting write tests..."
 
-run_file_benchmark "write_small_files" "write_small_files" "/app/tests/file/write_small_files/write_small_files_bun.js" "/app/tests/file/write_small_files/write_small_files_node.js"
-run_file_benchmark "write_large_file" "write_large_file" "/app/tests/file/write_large_file/write_large_file_bun.js" "/app/tests/file/write_large_file/write_large_file_node.js"
+run_file_benchmark "write_small_files" "write_small_files" "/app/tests/file/write_small_files/write_small_files_node.js" "/app/tests/file/write_small_files/write_small_files_bun.js" "/app/tests/file/write_small_files/write_small_files_deno.js"
+run_file_benchmark "write_large_file" "write_large_file" "/app/tests/file/write_large_file/write_large_file_node.js" "/app/tests/file/write_large_file/write_large_file_bun.js" "/app/tests/file/write_large_file/write_large_file_deno.js"
 
 echo "Write tests completed."
 echo "All file tests completed. Results are saved in their respective directories under /app/results."

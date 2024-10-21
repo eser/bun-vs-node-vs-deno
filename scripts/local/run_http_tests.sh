@@ -53,7 +53,7 @@ run_http_benchmark() {
     fi
     
     if ! bombardier $bombardier_args "http://$NODE_IP:$PORT$node_full_path" > "$RESULTS_DIR/$test_name/${test_name}_node_bombardier.json" 2>&1; then
-        echo "Error running Bombardier for Node test: $test_name" >&2
+        echo "Error running Bombardier for Node.js test: $test_name" >&2
     fi
     
     echo "HTTP benchmark for $test_name completed. Results saved in $RESULTS_DIR/$test_name/"
